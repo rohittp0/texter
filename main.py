@@ -6,7 +6,6 @@ cache = {}
 
 
 def request_content(domain: str):
-    domain = domain.replace("-", "/")
     request = requests.get(f"https://{domain}")
 
     if request.status_code == 200:
@@ -39,7 +38,10 @@ def handle_dns_request(data):
     for question in request.questions:
         if question.qtype == dnslib.QTYPE.TXT:
             # Fetch the content and split it into chunks
-            domain, offset = str(question.qname).split(".", 1)
+            offset, domain = str(question.qname).split(".", 1)
+            domain = domain.replace("-", "/")
+
+            print(domain, offset)
 
             if domain not in cache:
                 domain_data = request_content(domain)
@@ -60,9 +62,12 @@ def main():
 
         try:
             while True:
-                data, address = server_socket.recvfrom(512)
-                response = handle_dns_request(data)
-                server_socket.sendto(response, address)
+                try:
+                    data, address = server_socket.recvfrom(512)
+                    response = handle_dns_request(data)
+                    server_socket.sendto(response, address)
+                except Exception as e:
+                    print(f"An error occurred: {e}")
         except KeyboardInterrupt:
             print("DNS Server is stopping")
 
