@@ -1,0 +1,28 @@
+#!/bin/bash
+
+DOMAIN="$1"
+
+# Initial setup
+OFFSET=0
+FILE="$1.html"
+
+# Clear the file content
+> "$FILE"
+
+# Get the number of chunks
+NUM_CHUNKS=$(dig +short TXT "length.$DOMAIN" @dns.rohittp.com)
+
+# Remove quotes around the response
+NUM_CHUNKS=$(echo "$NUM_CHUNKS" | tr -d '"')
+
+# Use a loop to query each chunk
+while [ $OFFSET -lt $NUM_CHUNKS ]; do
+    RESPONSE=$(dig +short TXT "$OFFSET.$DOMAIN" @dns.rohittp.com)
+    # Remove quotes from DNS response
+    RESPONSE=$(echo "$RESPONSE" | tr -d '"')
+    # Append response to file
+    echo "$RESPONSE" >> "$FILE"
+    (( OFFSET=OFFSET+1 ))
+done
+
+echo "Completed. Data saved to $FILE."
