@@ -55,7 +55,7 @@ def handle_dns_request(data):
 def main():
     # Bind a socket to UDP port 53
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server_socket:
-        server_socket.bind(('0.0.0.0', 5353))  # Remember to use a different port if 53 is not available
+        server_socket.bind(('0.0.0.0', 53))  # Remember to use a different port if 53 is not available
         print("DNS Server is running")
 
         try:
