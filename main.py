@@ -48,7 +48,11 @@ def handle_dns_request(data):
                 chunks = split_data(domain_data)
                 cache[domain] = chunks
 
-            chunk = cache[domain][int(offset)]
+            if offset == "length":
+                chunk = str(len(cache[domain]))
+            else:
+                chunk = cache[domain][int(offset)]
+
             response.add_answer(dnslib.RR(question.qname, dnslib.QTYPE.TXT, rdata=dnslib.TXT(chunk), ttl=1))
 
     return response.pack()
